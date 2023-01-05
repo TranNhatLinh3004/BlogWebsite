@@ -17,4 +17,23 @@ const handleRegister = async(req, res) => {
     }
 };
 
-module.exports = { handleRegister };
+const handleLogin = async(req, res) => {
+    try {
+        const user = await User.findOne({ username: req.body.username });
+
+        // IF NOT USER
+
+        !user && res.status(400).json("User does not exist");
+
+        const validate = await bcrypt.compare(req.body.password, user.password);
+
+        !validate && res.status(400).json("Check your password again!");
+
+        const { password, ...other } = user._doc;
+        res.status(200).json(other);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+};
+
+module.exports = { handleRegister, handleLogin };
